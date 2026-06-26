@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<playlist xmlns="http://xspf.org/ns/0/" xmlns:vlc="http://www.videolan.org/vlc/playlist/ns/0/" version="1">
+	<title>Lista de reprodução</title>
+	<trackList>
+		<track>
+			<location>file:///C:/Users/murban/Downloads/ElevenLabs_2026-06-25T19_18_46_Anika%20-%20Sweet%2C%20Lively%20and%20Warm_pvc_sp100_s50_sb75_se0_b_m2%20%281%29.mp3</location>
+			<duration>37851</duration>
+			<extension application="http://www.videolan.org/vlc/playlist/0">
+				<vlc:id>0</vlc:id>
+			</extension>
+		</track>
+		<track>
+			<location>file:///C:/Users/murban/Downloads/ElevenLabs_2026-06-25T19_18_46_Anika%20-%20Sweet%2C%20Lively%20and%20Warm_pvc_sp100_s50_sb75_se0_b_m2%20%281%29.mp3</location>
+			<duration>37851</duration>
+			<extension application="http://www.videolan.org/vlc/playlist/0">
+				<vlc:id>1</vlc:id>
+			</extension>
+		</track>
+		<track>
+			<location>file:///C:/Users/murban/Downloads/ElevenLabs_2026-06-25T19_18_46_Anika%20-%20Sweet%2C%20Lively%20and%20Warm_pvc_sp100_s50_sb75_se0_b_m2%20%281%29.mp3</location>
+			<duration>37851</duration>
+			<extension application="http://www.videolan.org/vlc/playlist/0">
+				<vlc:id>2</vlc:id>
+			</extension>
+		</track>
+	</trackList>
+	<extension application="http://www.videolan.org/vlc/playlist/0">
+		<vlc:item tid="0"/>
+		<vlc:item tid="1"/>
+		<vlc:item tid="2"/>
+	</extension>
+</playlist>
