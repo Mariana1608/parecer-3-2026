@@ -303,7 +303,7 @@
         <div class="eq-bar"></div><div class="eq-bar"></div>
         <div class="eq-bar"></div><div class="eq-bar"></div>
       </div>
-      <span id="voice-status">Clique para ouvir</span>
+      <span id="voice-status">Clique 🔊 para ouvir</span>
     </div>
   </div>
 
@@ -396,22 +396,7 @@ Prazo máximo das parcerias:<br>
 ];
 
 let current = 0;
-const synth = window.speechSynthesis;
-let utterance = null;
-let ptVoice = null;
-
-function loadVoices() {
-  const voices = synth.getVoices();
-  if (!voices.length) return;
-  ptVoice = voices.find(v => v.lang === "pt-BR")
-          || voices.find(v => v.lang.startsWith("pt"))
-          || voices[0];
-  document.getElementById("voice-status").textContent =
-    ptVoice ? ptVoice.name.substring(0,30) : "voz padrão";
-}
-loadVoices();
-if (speechSynthesis.onvoiceschanged !== undefined)
-  speechSynthesis.onvoiceschanged = loadVoices;
+let currentAudio = null;
 
 const bubble     = document.getElementById("bubble");
 const bTitle     = document.getElementById("bubble-title");
@@ -436,7 +421,11 @@ STEPS.forEach((_, i) => {
 });
 
 function stopSpeech() {
-  if (synth.speaking) synth.cancel();
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+  }
   btnVoice.textContent = "🔊 Ouvir narração";
   btnVoice.classList.remove("playing");
   eq.classList.remove("active");
@@ -445,35 +434,26 @@ function stopSpeech() {
 }
 
 function speakStep(idx) {
-  if (!("speechSynthesis" in window)) { vStatus.textContent = "⚠ Sem suporte a voz"; return; }
   stopSpeech();
-  const step = STEPS[idx];
-  utterance = new SpeechSynthesisUtterance(step.voice);
-  if (ptVoice) utterance.voice = ptVoice;
-  utterance.lang  = "pt-BR";
-  utterance.rate  = 1.18;
-  utterance.pitch = 1.05;
-  utterance.volume = 1.0;
+  const fileName = "audio0" + (idx + 1) + ".mp3";
+  const audio = new Audio(fileName);
+  currentAudio = audio;
 
-  let progTimer = null;
-  const estMs = step.voice.length * 38;
-  let elapsed = 0;
-
-  utterance.onstart = () => {
+  audio.onplay = () => {
     btnVoice.textContent = "⏹ Parar";
     btnVoice.classList.add("playing");
     eq.classList.add("active");
     mouthGrp.classList.add("talking");
-    vStatus.textContent = "Narrando.";
-    elapsed = 0;
-    progTimer = setInterval(() => {
-      elapsed += 200;
-      vFill.style.width = Math.min(elapsed / estMs * 100, 95) + "%";
-    }, 200);
+    vStatus.textContent = "Narrando...";
   };
 
-  utterance.onend = () => {
-    clearInterval(progTimer);
+  audio.ontimeupdate = () => {
+    if (audio.duration) {
+      vFill.style.width = (audio.currentTime / audio.duration * 100) + "%";
+    }
+  };
+
+  audio.onended = () => {
     vFill.style.width = "100%";
     setTimeout(() => { vFill.style.width = "0%"; }, 700);
     btnVoice.textContent = "🔊 Ouvir narração";
@@ -481,19 +461,22 @@ function speakStep(idx) {
     eq.classList.remove("active");
     mouthGrp.classList.remove("talking");
     vStatus.textContent = "Concluído ✓";
+    currentAudio = null;
   };
 
-  utterance.onerror = () => {
-    clearInterval(progTimer);
+  audio.onerror = () => {
     stopSpeech();
-    vStatus.textContent = "⚠ Erro na síntese";
+    vStatus.textContent = "⚠ Áudio não encontrado";
   };
 
-  synth.speak(utterance);
+  audio.play().catch(() => {
+    stopSpeech();
+    vStatus.textContent = "⚠ Erro ao reproduzir";
+  });
 }
 
 btnVoice.addEventListener("click", () => {
-  if (synth.speaking) { stopSpeech(); vStatus.textContent = "Pausado"; }
+  if (currentAudio && !currentAudio.paused) { stopSpeech(); vStatus.textContent = "Pausado"; }
   else speakStep(current);
 });
 
